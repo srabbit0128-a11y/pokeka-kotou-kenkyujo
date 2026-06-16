@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ポケカ高騰研究所</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gold: #d4af37;
+            --dark-bg: #1a1a1a;
+            --card-bg: #2a2a2a;
+            --text-light: #f0f0f0;
+            --accent-gold: #f4d03f;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            border-bottom: 3px solid var(--primary-gold);
+            padding: 1.5rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+        }
+
+        .header-content h1 {
+            font-size: 2rem;
+            color: var(--primary-gold);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+        }
+
+        .header-content p {
+            color: var(--accent-gold);
+            font-size: 0.95rem;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: var(--card-bg);
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--primary-gold);
+            padding: 0;
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-right: 1px solid rgba(212, 175, 55, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        nav button:last-child {
+            border-right: none;
+        }
+
+        nav button:hover {
+            background-color: rgba(212, 175, 55, 0.1);
+            color: var(--primary-gold);
+        }
+
+        nav button.active {
+            color: var(--primary-gold);
+            background-color: rgba(212, 175, 55, 0.15);
+        }
+
+        nav button.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: var(--primary-gold);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        /* Sections */
+        section {
+            display: none;
+            animation: fadeIn 0.4s ease-in;
+        }
+
+        section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        section h2 {
+            color: var(--primary-gold);
+            font-size: 1.8rem;
+            margin: 2rem 0 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--primary-gold);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Card Grid */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: linear-gradient(135deg, var(--card-bg) 0%, #353535 100%);
+            border: 2px solid var(--primary-gold);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.1);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.25);
+            border-color: var(--accent-gold);
+        }
+
+        .card-rank {
+            display: inline-block;
+            background-color: var(--primary-gold);
+            color: var(--dark-bg);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            color: var(--accent-gold);
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.8rem;
+        }
+
+        .card-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+        }
+
+        .card-info span {
+            color: var(--text-light);
+        }
+
+        .card-info-label {
+            color: var(--primary-gold);
+            font-weight: 600;
+        }
+
+        .price-increase {
+            color: #ff6b6b;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .card-description {
+            color: #c0c0c0;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* AI Judgment Buttons */
+        .judgment-button {
+            display: inline-block;
+            padding: 0.7rem 1.2rem;
+            margin-top: 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .judgment-button.buy {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .judgment-button.buy:hover {
+            background-color: #27ae60;
+        }
+
+        .judgment-button.hold {
+            background-color: #f39c12;
+            color: white;
+        }
+
+        .judgment-button.hold:hover {
+            background-color: #e67e22;
+        }
+
+        .judgment-button.sell {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .judgment-button.sell:hover {
+            background-color: #c0392b;
+        }
+
+        .judgment-reason {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: rgba(212, 175, 55, 0.1);
+            border-left: 3px solid var(--primary-gold);
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #c0c0c0;
+        }
+
+        .judgment-reason.show {
+            display: block;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+
+        .empty-state p {
+            color: var(--primary-gold);
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content h1 {
+                font-size: 1.5rem;
+            }
+
+            nav {
+                flex-direction: column;
+            }
+
+            nav button {
+                border-right: none;
+                border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+                padding: 0.8rem 1rem;
+            }
+
+            nav button:last-child {
+                border-bottom: none;
+            }
+
+            nav button.active::after {
+                display: none;
+            }
+
+            nav button.active {
+                background-color: rgba(212, 175, 55, 0.2);
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 0.75rem;
+            }
+
+            section h2 {
+                font-size: 1.4rem;
+                margin: 1.5rem 0 1rem;
+            }
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--primary-gold);
+            text-align: center;
+            padding: 2rem 1rem;
+            margin-top: 3rem;
+            color: #999;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>🎴 ポケカ高騰研究所</h1>
+            <p>ポケモンカード価格トレンド分析プラットフォーム</p>
+        </div>
+    </header>
+
+    <nav>
+        <button class="nav-btn active" data-section="ranking">高騰ランキング</button>
+        <button class="nav-btn" data-section="anniversary">30周年注目カード</button>
+        <button class="nav-btn" data-section="ai-judgment">AI買い判定</button>
+    </nav>
+
+    <div class="container">
+        <!-- 高騰ランキング Section -->
+        <section id="ranking" class="active">
+            <h2>🚀 高騰ランキング TOP 10</h2>
+            <div class="card-grid" id="ranking-cards"></div>
+        </section>
+
+        <!-- 30周年注目カード Section -->
+        <section id="anniversary">
+            <h2>✨ 30周年注目カード</h2>
+            <div class="card-grid" id="anniversary-cards"></div>
+        </section>
+
+        <!-- AI買い判定 Section -->
+        <section id="ai-judgment">
+            <h2>🤖 AI買い判定</h2>
+            <div class="card-grid" id="ai-judgment-cards"></div>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 ポケカ高騰研究所 | ポケモンカード価格情報サービス</p>
+    </footer>
+
+    <script>
+        // Sample Data - 高騰ランキング
+        const rankingData = [
+            {
+                rank: 1,
+                title: 'ポケモンカードゲーム 25周年ゴールド',
+                series: 'プレミアムコレクション',
+                priceIncrease: '↑ 245%',
+                price: '¥18,500',
+                date: '2026年6月時点',
+                description: '限定版プレミアムボックス。市場での需要が非常に高く、継続的な高騰が見られている。'
+            },
+            {
+                rank: 2,
+                title: 'シャイニースターV BOX',
+                series: 'シャイニーシリーズ',
+                priceIncrease: '↑ 187%',
+                price: '¥12,800',
+                date: '2026年6月時点',
+                description: '高レアリティカード多数封入。コレクターに人気が集中している。'
+            },
+            {
+                rank: 3,
+                title: 'ハイクラスパック VSTARユニバース',
+                series: 'VSTAR',
+                priceIncrease: '↑ 156%',
+                price: '¥15,200',
+                date: '2026年6月時点',
+                description: 'VSTARシリーズの代表作。安定した高需要が続いている。'
+            },
+            {
+                rank: 4,
+                title: 'シャイニーボックス',
+                series: 'ベースセット',
+                priceIncrease: '↑ 142%',
+                price: '¥9,800',
+                date: '2026年6月時点',
+                description: 'エントリーユーザーに人気。供給不足が続く。'
+            },
+            {
+                rank: 5,
+                title: 'クラウンゼルプレミアム BOX',
+                series: 'クラウンゼル',
+                priceIncrease: '↑ 128%',
+                price: '¥7,600',
+                date: '2026年6月時点',
+                description: '新シリーズ注目商品。市場拡大により価格上昇中。'
+            },
+            {
+                rank: 6,
+                title: 'ターボパック',
+                series: 'テクノロジー',
+                priceIncrease: '↑ 98%',
+                price: '¥5,400',
+                date: '2026年6月時点',
+                description: '機械系カード人気が再燃。投資家からの注目が高い。'
+            }
+        ];
+
+        // Sample Data - 30周年注目カード
+        const anniversaryData = [
+            {
+                rank: '注目',
+                title: 'ピカチュウ 30周年ゴールドカード',
+                series: '30周年記念',
+                priceIncrease: '¥2,200 ～',
+                price: '注目度: ★★★★★',
+                date: 'アニバーサリー2026',
+                description: 'ポケモン30周年を記念した特別仕様。ゴールド箔押し加工で高級感あふれる一枚。'
+            },
+            {
+                rank: '注目',
+                title: 'リザードン 30周年スペシャルセット',
+                series: '30周年記念',
+                priceIncrease: '¥3,500 ～',
+                price: '注目度: ★★★★★',
+                date: 'アニバーサリー2026',
+                description: '初代三大御三家の一角。30周年限定デザインで高い価値を期待。'
+            },
+            {
+                rank: '注目',
+                title: 'フシギダネ 30周年プロモーション',
+                series: '30周年記念',
+                priceIncrease: '¥1,800 ～',
+                price: '注目度: ★★★★☆',
+                date: 'アニバーサリー2026',
+                description: '懐かしさと新しさを兼ね備えた逸品。コレクター必須アイテム。'
+            },
+            {
+                rank: '注目',
+                title: 'フリーザー 30周年レジェンド',
+                series: '30周年記念',
+                priceIncrease: '¥2,800 ～',
+                price: '注目度: ★★★★☆',
+                date: 'アニバーサリー2026',
+                description: '伝説のポケモン30周年版。希少性が高く、今後の騰落が注目される。'
+            },
+            {
+                rank: '注目',
+                title: 'ファイヤー 30周年エディション',
+                series: '30周年記念',
+                priceIncrease: '¥2,600 ～',
+                price: '注目度: ★★★★☆',
+                date: 'アニバーサリー2026',
+                description: '炎タイプの象徴。限定製造により供給が限定的。'
+            },
+            {
+                rank: '注目',
+                title: 'サンダー 30周年コレクション',
+                series: '30周年記念',
+                priceIncrease: '¥2,500 ～',
+                price: '注目度: ★★★★☆',
+                date: 'アニバーサリー2026',
+                description: '電気タイプの王者。アニバーサリーシリーズの要となるカード。'
+            }
+        ];
+
+        // Sample Data - AI買い判定
+        const aiJudgmentData = [
+            {
+                rank: '推奨',
+                title: 'ゴールドボックス',
+                series: 'プレミアム',
+                judgment: 'BUY',
+                price: '¥22,000',
+                date: '現在評価',
+                description: 'AIモデルは強気買い推奨。供給限定性と継続的需要が高い評価を受けています。',
+                reason: '確度: 87% | 信頼スコア: 高 | 推奨ホールド期間: 6-12ヶ月 | 想定上昇幅: 35-50%'
+            },
+            {
+                rank: '推奨',
+                title: 'シャイニーコレクション',
+                series: 'スターシリーズ',
+                judgment: 'BUY',
+                price: '¥14,500',
+                date: '現在評価',
+                description: 'トレンド分析で上昇トレンド継続中。買い判定は継続可能と評価。',
+                reason: '確度: 82% | 信頼スコア: 高 | 推奨ホールド期間: 3-6ヶ月 | 想定上昇幅: 25-40%'
+            },
+            {
+                rank: '様子見',
+                title: 'ハイクラスセット',
+                series: 'スタンダード',
+                judgment: 'HOLD',
+                price: '¥8,800',
+                date: '現在評価',
+                description: 'AI判定は様子見。市場調整局面との判断。短期購入は控えめの推奨。',
+                reason: '確度: 61% | 信頼スコア: 中 | 推奨ホールド期間: 1-3ヶ月 | 想定変動幅: -5～+15%'
+            },
+            {
+                rank: '様子見',
+                title: 'スタンダードパック',
+                series: 'ベース',
+                judgment: 'HOLD',
+                price: '¥5,200',
+                date: '現在評価',
+                description: 'マーケット飽和の兆候。新シリーズ発表まで保有推奨。',
+                reason: '確度: 58% | 信頼スコア: 中 | 推奨ホールド期間: 1-2ヶ月 | 想定変動幅: -10～+8%'
+            },
+            {
+                rank: '売却検討',
+                title: 'レギュラーボックス',
+                series: 'プレビアス',
+                judgment: 'SELL',
+                price: '¥3,400',
+                date: '現在評価',
+                description: 'AIモデルは売却推奨。需要減退と供給過剰の兆候あり。',
+                reason: '確度: 79% | 信頼スコア: 高 | 推奨売却期間: 今月中 | 想定下落幅: 20-35%'
+            },
+            {
+                rank: '売却検討',
+                title: 'レガシーパック',
+                series: '旧世代',
+                judgment: 'SELL',
+                price: '¥2,100',
+                date: '現在評価',
+                description: '需要急速減退。市場での流動性が低下傾向。早期売却推奨。',
+                reason: '確度: 85% | 信頼スコア: 高 | 推奨売却期間: 緊急 | 想定下落幅: 30-45%'
+            }
+        ];
+
+        // Initialize
+        function init() {
+            renderRankingCards();
+            renderAnniversaryCards();
+            renderAIJudgmentCards();
+            setupNavigation();
+        }
+
+        // Render Ranking Cards
+        function renderRankingCards() {
+            const container = document.getElementById('ranking-cards');
+            container.innerHTML = rankingData.map(item => `
+                <div class="card">
+                    <div class="card-rank">第${item.rank}位</div>
+                    <div class="card-title">${item.title}</div>
+                    <div class="card-info">
+                        <span><span class="card-info-label">シリーズ:</span> ${item.series}</span>
+                    </div>
+                    <div class="card-info">
+                        <span><span class="card-info-label">現在価格:</span> ${item.price}</span>
+                    </div>
+                    <div class="price-increase">${item.priceIncrease}</div>
+                    <div class="card-description">${item.description}</div>
+                    <div style="color: #999; font-size: 0.85rem; margin-top: 0.8rem;">${item.date}</div>
+                </div>
+            `).join('');
+        }
+
+        // Render Anniversary Cards
+        function renderAnniversaryCards() {
+            const container = document.getElementById('anniversary-cards');
+            container.innerHTML = anniversaryData.map(item => `
+                <div class="card">
+                    <div class="card-rank">${item.rank}</div>
+                    <div class="card-title">${item.title}</div>
+                    <div class="card-info">
+                        <span><span class="card-info-label">予想価格:</span> ${item.priceIncrease}</span>
+                    </div>
+                    <div class="card-info">
+                        <span><span class="card-info-label">${item.price}</span></span>
+                    </div>
+                    <div class="card-description">${item.description}</div>
+                    <div style="color: #999; font-size: 0.85rem; margin-top: 0.8rem;">${item.date}</div>
+                </div>
+            `).join('');
+        }
+
+        // Render AI Judgment Cards
+        function renderAIJudgmentCards() {
+            const container = document.getElementById('ai-judgment-cards');
+            container.innerHTML = aiJudgmentData.map((item, index) => `
+                <div class="card">
+                    <div class="card-rank">${item.rank}</div>
+                    <div class="card-title">${item.title}</div>
+                    <div class="card-info">
+                        <span><span class="card-info-label">現在価格:</span> ${item.price}</span>
+                    </div>
+                    <div class="card-description">${item.description}</div>
+                    <button class="judgment-button ${item.judgment.toLowerCase()}" onclick="toggleReason(${index})">${item.judgment}</button>
+                    <div class="judgment-reason" id="reason-${index}">
+                        <strong>AI分析結果:</strong><br>${item.reason}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Toggle Judgment Reason
+        function toggleReason(index) {
+            const reason = document.getElementById(`reason-${index}`);
+            reason.classList.toggle('show');
+        }
+
+        // Setup Navigation
+        function setupNavigation() {
+            const buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    buttons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    const sections = document.querySelectorAll('section');
+                    sections.forEach(section => section.classList.remove('active'));
+                    
+                    const targetSection = document.getElementById(button.dataset.section);
+                    targetSection.classList.add('active');
+                });
+            });
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
